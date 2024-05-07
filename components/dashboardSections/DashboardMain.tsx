@@ -49,6 +49,8 @@ import DashboardMessage from '../DashboardMessage';
 import TicketList from '../TicketList';
 import SkeletonLoader from '../ui/skeletonLoader';
 import { useRouter } from 'next/navigation';
+import { useToast } from '../ui/use-toast';
+import NoThingHere from '../ui/no-thing';
 
 interface Project {
   id: string;
@@ -83,6 +85,12 @@ const DashboardMain = () => {
   const [loadingProjects, setLoadingProjects] = useState<boolean>(true);
   const [loadingTickets, setLoadingTickets] = useState<boolean>(true);
   const router = useRouter();
+  const { toast } = useToast();
+
+  const filteredTickets = tickets.filter(
+    (ticket) => ticket.status === 'active' || ticket.status === 'inprogress'
+  );
+
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -90,9 +98,7 @@ const DashboardMain = () => {
         const data = await response.json();
         setLoadingProjects(false);
         setProjects(data);
-        if (data.length === 0) {
-          router.push('/tickets');
-        }
+        console.log('projects:', data);
       } catch (error) {
         console.error('Error fetching projects:', error);
       }
@@ -100,6 +106,16 @@ const DashboardMain = () => {
 
     fetchProjects();
   }, []);
+
+  useEffect(() => {
+    if (projects.length === 0 && !loadingProjects) {
+      router.push('/tickets');
+      toast({
+        title: 'You need to create project to get started!',
+        description: <div>Lets create a project</div>,
+      });
+    }
+  }, [projects, loadingProjects]);
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -112,7 +128,11 @@ const DashboardMain = () => {
           setLoadingTickets(false);
 
           if (data.length === 0) {
-            router.push('/tickets');
+            //   router.push('/tickets');
+            toast({
+              title: 'Create a ticket to get started!',
+              description: <div>Lets create a ticket</div>,
+            });
           }
         }
       } catch (error) {
@@ -123,33 +143,46 @@ const DashboardMain = () => {
     fetchTickets();
   }, [projects]);
 
-  const noProject = projects[0] === undefined || projects[0] === null;
-  const noTickets = tickets[0] === undefined || tickets[0] === null;
+  const noTickets = tickets.length === 0;
+  const noProject = projects.length === 0;
 
   const cardsData = [
     {
       index: 1,
-      value: noTickets
+      value: loadingTickets
         ? null
-        : tickets.filter((ticket) => ticket.status === "Completed").length.toString(),
+        : noTickets
+        ? '0'
+        : tickets.filter((ticket) => ticket.status === 'completed').length +
+          tickets.filter((ticket) => ticket.status === 'archived').length,
       subtitle: 'Total completed tickets!',
     },
     {
       index: 2,
-      value: noTickets
+      value: loadingTickets
         ? null
-        : tickets.filter((ticket) => ticket.status?.length).length.toString(),
+        : noTickets
+        ? '0'
+        : tickets.filter((ticket) => ticket.status === 'inprogress').length +
+          tickets.filter((ticket) => ticket.status === 'active').length,
       subtitle: 'Total active tickets!',
     },
     {
       index: 3,
-      value: noTickets ? null : tickets.length.toString(),
+      value: loadingTickets
+        ? null
+        : noTickets
+        ? '0'
+        : tickets.length.toString(),
       subtitle: 'Total tickets!',
     },
     {
       index: 4,
-      // value: noProject ? "0" : projects.length.toString(),
-      value: noProject ? null : projects[0].projectName,
+      value: loadingProjects
+        ? null
+        : noProject
+        ? 'No Project'
+        : projects[0]?.projectName || 'No Project',
       subtitle: 'Great project name!',
     },
   ];
@@ -164,8 +197,10 @@ const DashboardMain = () => {
             <div className='grid gap-2'>
               <CardTitle>Tickets</CardTitle>
               <CardDescription>
-                Active tickets for your great project:{' '}
-                {noProject ? '' : projects[0].projectName}
+                {noProject
+                  ? ''
+                  : 'Active tickets for your great project: ' +
+                    projects[0].projectName}
               </CardDescription>
             </div>
             <Button asChild size='sm' className='ml-auto gap-1'>
@@ -176,11 +211,52 @@ const DashboardMain = () => {
             </Button>
           </CardHeader>
           <CardContent>
-            <TicketList
-              lite={true}
-              tickets={tickets}
-              projectName={noProject ? '' : projects[0].projectName}
-            />
+            {loadingTickets ? (
+              <TicketList
+                lite={true}
+                tickets={filteredTickets}
+                projectName={noProject ? '' : projects[0].projectName}
+              />
+            ) : noTickets ? (
+              <div>
+                <div className='flex flex-1 items-center w-full h-full py-12 justify-center rounded-lg border border-dashed shadow-sm'>
+                  <div className='flex flex-col items-center gap-1 text-center'>
+                    <h3 className='text-2xl font-bold tracking-tight'>
+                      You have no tickets
+                    </h3>
+                    <p className='text-sm text-muted-foreground'>
+                      You can start building as soon as you add a ticket.
+                    </p>
+                    <a href='/createTicket' className='mt-4'>
+                      <Button>Create Ticket</Button>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            ) : filteredTickets.length > 0 ? (
+              <TicketList
+                lite={true}
+                tickets={filteredTickets}
+                projectName={noProject ? '' : projects[0].projectName}
+              />
+            ) : (
+              <div>
+                <div className='flex flex-1 items-center w-full h-full py-12 justify-center rounded-lg border border-dashed shadow-sm'>
+                  <div className='flex flex-col items-center gap-1 text-center'>
+                    <h3 className='text-2xl font-bold tracking-tight'>
+                      You have no active tickets
+                    </h3>
+                    <p className='text-sm text-muted-foreground'>
+                      You can start track your tickets as soon as you add a
+                      ticket.
+                    </p>
+                    <a href='/createTicket' className='mt-4'>
+                      <Button>Create Ticket</Button>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
         <DashboardMessage />
@@ -190,3 +266,6 @@ const DashboardMain = () => {
 };
 
 export default DashboardMain;
+function asd() {
+  throw new Error('Function not implemented.');
+}

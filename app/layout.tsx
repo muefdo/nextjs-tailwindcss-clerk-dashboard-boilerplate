@@ -3,7 +3,9 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { ClerkProvider } from '@clerk/nextjs';
 import { dark, neobrutalism } from '@clerk/themes';
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from '@/components/ui/toaster';
+import { Magnet } from 'lucide-react';
+import ModalProvider from '@/components/ui/modal-provider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -27,11 +29,10 @@ export default function RootLayout({
       <html lang='en'>
         <body className={inter.className}>
           <main>
-
+            <ModalProvider />
             {children}
-          </main>
+            </main>
           <Toaster />
-
         </body>
       </html>
     </ClerkProvider>

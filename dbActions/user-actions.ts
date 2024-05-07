@@ -69,3 +69,36 @@ export async function updateUser(name: string, lastName: string) {
     return new NextResponse("Error", { status: 500 });
   }
 }
+
+export async function getUserType() {
+  try {
+    const { userId } = auth();
+    if (!userId) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    const user = await currentUser();
+    if (!user) {
+      return new NextResponse("User not exist", { status: 404 });
+    }
+
+    const dbUser = await prisma.user.findUnique({
+      where: { clerkId: user.id },
+    });
+
+    if (!dbUser) {
+      return new NextResponse("User not found", { status: 404 });
+    }
+
+
+    
+
+
+
+    
+    return dbUser.userType;
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    return new NextResponse("Error", { status: 500 });
+  }
+}

@@ -139,7 +139,6 @@ const TicketDetails = () => {
       setLoadingSubmit(true);
       const formData = new FormData(event.currentTarget);
       const content = formData.get('content') as string;
-      console.log('Form data:', content);
 
       const response = await fetch('/api/messages', {
         method: 'POST',
@@ -204,16 +203,16 @@ const TicketDetails = () => {
               {projectName ? <p>{projectName}</p> : <OneLineSkeletonLoader />}
             </p>
           </div>
-          <div className='space-y-3 overflow-auto h-3/6 scrollbar-hide scrollbar-thin '>
+          <div className='space-y-3 overflow-auto h-[20rem] max-h-[20rem] md:h-[35rem] md:max-h-[35rem] scrollbar-hide scrollbar-thin '>
             {Array.isArray(messages) ? (
               messages.map((message: Message, index: number) => (
                 <div
                   key={index}
-                  className='flex flex-col space-y-2  w-full p-4 text-left rounded-lg bg-gray-100 dark:bg-gray-800 focus:outline-none'
+                  className={`flex flex-col space-y-2  w-full p-4 text-left rounded-lg  dark:bg-gray-800 focus:outline-none ${message.sender === 'admin' ? 'bg-gray-300' : 'bg-gray-100'}`}
                 >
                   <div className='flex items-center space-x-2'>
                     <div className='space-y-1'>
-                      <p className='text-sm font-medium leading-none'>You</p>
+                      <p className='text-sm font-medium leading-none'>{message.sender !== "admin" ? "You" : "Admin"}</p>
                       <time className='text-xs text-gray-400 font-medium'>
                         {messages[index]?.createdAt &&
                           timePassedFromNow(messages[index]?.createdAt)}
@@ -221,7 +220,9 @@ const TicketDetails = () => {
                     </div>
                   </div>
                   <div>
-                    <p className='font-medium'>{message.content}</p>
+                    <p className='font-medium max-w-[50rem] overflow-hidden   '>
+                      <span className=''>{message.content}</span>
+                    </p>
                   </div>
                 </div>
               ))

@@ -1,3 +1,5 @@
+"use client";
+
 import Link from 'next/link';
 import {
   Bell,
@@ -32,8 +34,26 @@ import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { sections } from '@/public/assets';
 import { UserButton } from '@clerk/nextjs';
+import ProModal from './ui/pro-modal';
+import { useEffect, useState } from 'react';
 
 const DashboardNav = () => {
+
+  const [userType, setUserType] = useState('');
+
+  useEffect(() => {
+    const fetchUserType = async () => {
+      try {
+        const response = await fetch('/api/userType');
+        const data = await response.json();
+        setUserType(data);
+      } catch (error) {
+        console.error('Error fetching user type:', error);
+      }
+    };
+
+    fetchUserType();
+  }, []);
   return (
     <header className='flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6'>
       <Sheet>
@@ -46,10 +66,11 @@ const DashboardNav = () => {
         <SheetContent side='left' className='flex flex-col'>
           <nav className='grid gap-2 text-lg font-medium'>
             <Link
-              href='#'
-              className='flex items-center gap-2 text-lg font-semibold'
+              href='/dashboard'
+              className='flex items-center gap-2 text-lg font-semibold pb-5'
             >
-              <img src='/logo.png' alt='' className='w-5/12' />
+              {/* <img src='/logo.png' alt='' className='w-8/12' /> */}
+              bradigo
               <span className='sr-only'>bradigo</span>
             </Link>
             {sections.map((section, index) => (
@@ -63,21 +84,9 @@ const DashboardNav = () => {
               </Link>
             ))}
           </nav>
-          <div className='mt-auto'>
-            <Card>
-              <CardHeader>
-                <CardTitle>Upgrade to Pro</CardTitle>
-                <CardDescription>
-                  Unlock all features and get unlimited access to our support
-                  team.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button size='sm' className='w-full'>
-                  Upgrade
-                </Button>
-              </CardContent>
-            </Card>
+          <div className='mt-auto '>
+            <ProModal userType={userType} />
+
           </div>
         </SheetContent>
       </Sheet>

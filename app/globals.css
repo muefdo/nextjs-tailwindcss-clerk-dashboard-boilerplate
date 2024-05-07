@@ -74,8 +74,27 @@
     @apply bg-background text-foreground;
   }
 }
+@font-face {
+  font-family: 'Mont-Heavy';
+  src: url('/Montserrat-Black.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
 
+@font-face {
+  font-family: 'Mont-Light';
+  src: url('/Montserrat-Regular.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
 .scrollbar-thin {
   scrollbar-width: thin;
   scrollbar-color: rgb(181, 181, 181) transparent;
+}
+
+.font-mont {
+  font-family: 'Mont-Heavy', sans-serif;
+}
+.font-mont-light {
+  font-family: 'Mont-Light', sans-serif;
 }

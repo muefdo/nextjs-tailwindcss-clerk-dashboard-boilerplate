@@ -54,7 +54,7 @@ model Ticket {
 
 model Message {
   id        String   @id @default(cuid())
-  sender    String // ID of the user who sent the message
+  sender    String // user, admin
   content   String // Content of the message
   ticket    Ticket   @relation(fields: [ticketId], references: [id])
   ticketId  String // ID of the ticket this message belongs to

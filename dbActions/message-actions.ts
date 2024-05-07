@@ -19,7 +19,7 @@ export async function createMessage(ticketId: string, content: string) {
     const dbUser = await prisma.user.findUnique({
       where: { clerkId: userId },
     });
-    
+
     if (!dbUser) {
       return new NextResponse("User not exist", { status: 404 });
     }
@@ -32,9 +32,11 @@ export async function createMessage(ticketId: string, content: string) {
       return new NextResponse("Ticket not exist", { status: 404 });
     }
 
+    const senderType = dbUser.userType === "admin" ? "admin" : "user";
+
     const newMessage = await prisma.message.create({
       data: {
-        sender: dbUser.id,
+        sender: senderType,
         content,
         ticketId,
       },

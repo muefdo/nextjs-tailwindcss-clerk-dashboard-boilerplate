@@ -8,6 +8,7 @@ import TicketList from '../TicketList';
 import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '../ui/button';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../ui/select';
 
 interface Project {
   id: string;
@@ -41,6 +42,8 @@ const DashboardTickets = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loadingProjects, setLoadingProjects] = useState<boolean>(true);
   const [loadingTickets, setLoadingTickets] = useState<boolean>(true);
+  const [filter, setFilter] = useState<string>(''); // State to store the filter option
+
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -66,7 +69,6 @@ const DashboardTickets = () => {
           const data = await response.json();
           setTickets(data);
           setLoadingTickets(false);
-          console.log('DATATİCKET', data);
         }
       } catch (error) {
         console.error('Error fetching tickets:', error);
@@ -79,9 +81,14 @@ const DashboardTickets = () => {
   const noProject = projects[0] === undefined || projects[0] === null;
   const noTickets = tickets[0] === undefined || tickets[0] === null;
 
-  console.log(noProject, noTickets);
-  console.log('TİCEKTTSS', tickets);
-  console.log('PrJECETTOO', projects);
+
+  const handleFilterChange = (value: string) => {
+    setFilter(value);
+  };
+
+  const filteredTickets = filter
+    ? tickets.filter((ticket) => ticket.status === filter)
+    : tickets.filter((ticket) => ticket.status !== 'archived');
 
   return (
     <DashSectionWrapper>
@@ -94,8 +101,28 @@ const DashboardTickets = () => {
           </Link>
         </Button>
       )}
+      {!noProject && !noTickets && (
+        <div className='flex gap-2 w-11/12 '>
+          <Select value={filter} onValueChange={handleFilterChange}>
+            <SelectTrigger className="w-5/12">
+              <SelectValue placeholder="Select Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup >
+                <SelectLabel>All</SelectLabel>
+                <SelectItem value='inprogress'>In Progress</SelectItem>
+                <SelectItem value='active'>Active</SelectItem>
+                <SelectItem value='completed'>Completed</SelectItem>
+                <SelectItem value='archived'>Archived</SelectItem>  
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          <Button onClick={() => setFilter("")}>Reset Filter</Button>
+
+        </div>
+      )}
       <p className='md:hidden text-xs text-gray-500'>
-        Some details are hidden on mobile. For more details, please visiton your
+        Some details are hidden on mobile. For more details, please visit on your
         computer.{' '}
       </p>
       {loadingProjects && loadingTickets ? (
@@ -114,13 +141,13 @@ const DashboardTickets = () => {
           ) : loadingTickets ? (
             <TicketList
               lite={false}
-              tickets={tickets}
+              tickets={filteredTickets}
               projectName={projects[0].projectName}
             />
-          ) : tickets.length > 0 ? (
+          ) : filteredTickets.length > 0 ? (
             <TicketList
               lite={false}
-              tickets={tickets}
+              tickets={filteredTickets}
               projectName={projects[0].projectName}
             />
           ) : (

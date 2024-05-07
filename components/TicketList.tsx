@@ -95,7 +95,6 @@ const TicketList = ({
     );
   };
 
-  console.log('tickets', tickets);
 
   return (
     <Card className='xl:col-span-2'>
@@ -108,7 +107,9 @@ const TicketList = ({
               {!lite && <TableHead className=''>Status</TableHead>}
               <TableHead className='max-md:hidden'>Categories</TableHead>
               <TableHead className='max-md:hidden'>Priority</TableHead>
-              {!lite && <TableHead className='text-right max-md:hidden'>Date</TableHead>}
+              {!lite && (
+                <TableHead className='text-right max-md:hidden'>Date</TableHead>
+              )}
             </TableRow>
           </TableHeader>
           {tickets.length > 0 ? (
@@ -125,7 +126,7 @@ const TicketList = ({
                     </Button>
                   </TableCell>
                   <TableCell>
-                    <div className='font-medium'>
+                    <div className='font-medium overflow-ellipsis overflow-hidden'>
                       {ticket.title?.trim().substring(0, 30)}
                     </div>
                   </TableCell>

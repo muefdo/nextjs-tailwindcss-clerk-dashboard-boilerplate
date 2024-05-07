@@ -26,7 +26,16 @@ export async function GET() {
         clerkId: user.id,
         name: user.firstName ?? '',
         lastName: user.lastName ?? '',
-        email: user.emailAddresses[0].emailAddress ?? '', 
+        email: user.emailAddresses[0].emailAddress ?? '',
+      },
+    });
+  }
+
+  if (!dbUser) {
+    return new NextResponse(null, {
+      status: 302, // 302 Found - temporary redirect
+      headers: {
+        Location: 'https://go.bradi.tech/api/auth/new-user',
       },
     });
   }
