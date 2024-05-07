@@ -8,6 +8,11 @@ Get started quickly on your next project with this comprehensive foundation.
 
 # In app images
 
+## Beatiful Landing Page
+![image](https://github.com/muefdo/nextjs-tailwindcss-clerk-dashboard-boilerplate/assets/112949938/c66375d6-813a-42a7-951a-752d9463ec55)
+![image](https://github.com/muefdo/nextjs-tailwindcss-clerk-dashboard-boilerplate/assets/112949938/1aafa49e-863b-4414-8403-3a9f39c22e9e)
+
+
 ##  Beatiful Loading States 
 ![image](https://github.com/muefdo/nextjs-tailwindcss-clerk-dashboard-boilerplate/assets/112949938/bab62c3b-6ca0-4e06-ad8c-61658b62599d)
 
