@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String    @id @default(cuid())
+  clerkId          String?   @unique
+  email            String    @unique
+  name             String?
+  lastName         String?
+  userType         String    @default("free") // free, standard, pro ,admin
+  subscriptionDate String[] // ERRROOORRR VEREBBİLİR
+  projects         Project[] // A user can have multiple projects
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+model Project {
+  id               String   @id @default(cuid())
+  projectName      String
+  projectInfo      String? // Optional project information
+  techStack        String[]
+  projectUrl       String? // Optional project URL
+  githubUrl        String? // Optional GitHub URL
+  completedTickets Int? // Number of completed tickets (optional)
+  tickets          Ticket[] // A project can have multiple tickets
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  User             User?    @relation(fields: [userId], references: [id])
+  userId           String?
+}
+
+model Ticket {
+  id                  String    @id @default(cuid())
+  title               String? // Optional title for the ticket
+  messages            Message[] // Messages associated with the ticket
+  status              String?   @default("active") // active, inprogress, completed
+  category            String[]
+  priority            String? // low, medium, high
+  estimatedFinishTime String? // Estimated time to complete the ticket
+  project             Project   @relation(fields: [projectId], references: [id])
+  projectId           String // ID of the project this ticket belongs to
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  sender    String // user, admin
+  content   String // Content of the message
+  ticket    Ticket   @relation(fields: [ticketId], references: [id])
+  ticketId  String // ID of the ticket this message belongs to
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
